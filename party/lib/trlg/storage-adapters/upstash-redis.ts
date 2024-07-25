@@ -14,8 +14,8 @@ export default class UpstashRedisAdapter implements StorageAdapter<true> {
         this.gameId = gameId
         this._json = initialJSON
         this.redis = Redis.fromEnv({
-            NEXT_UPSTASH_REDIS_REST_URL: env.NEXT_UPSTASH_REDIS_REST_URL,
-            NEXT_UPSTASH_REDIS_REST_TOKEN: env.NEXT_UPSTASH_REDIS_REST_TOKEN
+            UPSTASH_REDIS_REST_URL: env.NEXT_UPSTASH_REDIS_REST_URL,
+            UPSTASH_REDIS_REST_TOKEN: env.NEXT_UPSTASH_REDIS_REST_TOKEN
         })
     }
     public async load(): Promise<"OK" | null> {
