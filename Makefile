@@ -8,4 +8,4 @@ postbuild:
 	npm run postbuild
 
 
-netlify: prepare-astro build postbuild
+netlify: prepare-astro build
