@@ -9,7 +9,7 @@ import netlify from "@astrojs/netlify/functions";
 export default defineConfig({
   site: "https://debconf24-bof.newsniper.org/",
   integrations: [tailwind(), qwikdev(), auth()],
-  output: "hybrid",
+  output: "server",
   adapter: netlify({
     cacheOnDemandPages: false
   })
