@@ -5,4 +5,4 @@ build:
 	CI=false npm run build
 
 
-netlify: prepare-astro build
+deploy: prepare-astro build
