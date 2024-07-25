@@ -9,7 +9,7 @@ export default component$(() => {
 
     return <div>
         <button onClick$={(e,element) => {
-            socket?.emit("pickTargetPlayer")
+            socket?.emitWithoutValue("pickTargetPlayer")
         }}>운명의 장난으로 누구와 얽히게 될까요?</button>
     </div>
 })

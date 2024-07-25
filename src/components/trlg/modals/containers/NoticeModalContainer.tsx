@@ -14,7 +14,7 @@ export default component$(() => {
         <br/>
         {(myPid === nowPid) && <button
             onClick$={(e,element) => {
-                socket?.emit("noticeChecked")
+                socket?.emitWithoutValue("noticeChecked")
             }}>
             확인
         </button>}

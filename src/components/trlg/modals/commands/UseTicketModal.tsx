@@ -12,10 +12,10 @@ export default component$(() => {
         <p>{ticketName} 티켓을 사용하시겠습니까?</p>
         <br/>
         <button onClick$={() => {
-            context.socket.value?.emit("useTicket")
+            context.socket.value?.emitWithoutValue("useTicket")
         }}>네</button>
         <button onClick$={() => {
-            context.socket.value?.emit("nop")
+            context.socket.value?.emitWithoutValue("nop")
         }}>아니오</button>
     </div>
 })

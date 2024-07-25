@@ -24,20 +24,20 @@ export default component$(() => {
         <button
             disabled={!(Math.max(0,lawyer) !== 0)}
             onClick$={(e, element) => {
-                socket?.emit("thanksToLawyer")
+                socket?.emitWithoutValue("thanksToLawyer")
             }}>
             변호사의 도움을 받기
         </button>
         <button
             disabled={!(cash >= 400000)}
             onClick$={(e, element) => {
-                socket?.emit("showMeTheMONEY")
+                socket?.emitWithoutValue("showMeTheMONEY")
             }}>
             보석금 내고 풀려나기
         </button>
         <button
             onClick$={(e, element) => {
-                socket?.emit("rollDice")
+                socket?.emitWithoutValue("rollDice")
             }}>
             운빨을 노려보기
         </button>

@@ -25,6 +25,6 @@ export default component$(() => {
         <br/>
         <button onClick$={(e,element) => socket?.emit("startLotto", false)}>두배 찬스 사용하지 않고 도전</button>
         <br/>
-        <button onClick$={(e,element) => socket?.emit("nop")}>도전하지 않기</button>
+        <button onClick$={(e,element) => socket?.emitWithoutValue("nop")}>도전하지 않기</button>
     </div>
 })

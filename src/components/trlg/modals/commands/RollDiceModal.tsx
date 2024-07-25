@@ -9,7 +9,7 @@ export default component$(() => {
 
     return <div>
         <button onClick$={(e,element) => {
-            socket?.emit("rollDice")
+            socket?.emitWithoutValue("rollDice")
         }}>주사위 굴리기</button>
     </div>
 })

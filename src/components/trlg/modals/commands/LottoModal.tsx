@@ -59,7 +59,7 @@ export default component$(() => {
             <button
                 disabled={lottoTriesCountCache === 0}
                 onClick$={(e,element) => {
-                    socket?.emit("stopLotto")
+                    socket?.emitWithoutValue("stopLotto")
                 }}>
                 멈춰!
             </button>
