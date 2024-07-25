@@ -13,7 +13,6 @@
   "dependencies": {
     "@astrojs/check": "^0.8.2",
     "@astrojs/netlify": "^5.4.0",
-    "@astrojs/node": "^8.3.2",
     "@astrojs/tailwind": "^5.1.0",
     "@auth/core": "^0.32.0",
     "@builder.io/qwik": "^1.7.1",
@@ -23,7 +22,6 @@
     "astro": "^4.12.2",
     "auth-astro": "^4.1.2",
     "clsx": "^2.1.1",
-    "lowdb": "^7.0.1",
     "partysocket": "^1.0.1",
     "tailwind-merge": "^2.4.0",
     "tailwindcss": "^3.4.6",
