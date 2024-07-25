@@ -7,7 +7,6 @@
     "dev-verbose": "concurrently \"partykit dev\" \"astro dev --verbose\"",
     "start": "astro dev",
     "build": "partykit deploy && astro check && astro build",
-    "postbuild": "node ./postbuild.mjs -path https://debconf24-bof.newsniper.org/",
     "preview": "astro preview",
     "astro": "astro"
   },
