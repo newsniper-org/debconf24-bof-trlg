@@ -8,14 +8,14 @@ export default class UpstashRedisAdapter implements StorageAdapter<true> {
     private redis: Redis
 
     public constructor(gameId: string, initialJSON: ActorStorageJSON, env: {
-        UPSTASH_REDIS_REST_URL: string,
-        UPSTASH_REDIS_REST_TOKEN: string
+        NEXT_UPSTASH_REDIS_REST_URL: string,
+        NEXT_UPSTASH_REDIS_REST_TOKEN: string
     }) {
         this.gameId = gameId
         this._json = initialJSON
         this.redis = Redis.fromEnv({
-            UPSTASH_REDIS_REST_URL: env.UPSTASH_REDIS_REST_URL,
-            UPSTASH_REDIS_REST_TOKEN: env.UPSTASH_REDIS_REST_TOKEN
+            NEXT_UPSTASH_REDIS_REST_URL: env.NEXT_UPSTASH_REDIS_REST_URL,
+            NEXT_UPSTASH_REDIS_REST_TOKEN: env.NEXT_UPSTASH_REDIS_REST_TOKEN
         })
     }
     public async load(): Promise<"OK" | null> {

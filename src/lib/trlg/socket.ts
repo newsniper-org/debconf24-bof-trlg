@@ -210,7 +210,7 @@ export class TRLGClient {
 
 
         this.socket = new PartySocket({
-            host: import.meta.env.PUBLIC_PARTYKIT_URL,
+            host: import.meta.env.NEXT_PUBLIC_PARTYKIT_URL,
             room: `${gameId}`,
         });
         this._state = ""

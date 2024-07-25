@@ -129,8 +129,8 @@ export default class TRLGServer implements Party.Server {
             snapshotJSON: "",
             playerAccounts: ["", "", "", ""]
         }, async (_, init) => new UpstashRedisAdapter(this.gameId,init, {
-            UPSTASH_REDIS_REST_URL: this.env.UPSTASH_REDIS_REST_URL as string,
-            UPSTASH_REDIS_REST_TOKEN: this.env.UPSTASH_REDIS_REST_TOKEN as string
+            NEXT_UPSTASH_REDIS_REST_URL: this.env.NEXT_UPSTASH_REDIS_REST_URL as string,
+            NEXT_UPSTASH_REDIS_REST_TOKEN: this.env.NEXT_UPSTASH_REDIS_REST_TOKEN as string
         }))
     }
 
