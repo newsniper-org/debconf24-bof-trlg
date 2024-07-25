@@ -7,12 +7,14 @@ export default function DebianSalsa<P extends GitLabProfile> ({clientId, clientS
         name: "Debian Salsa",
         type: "oidc",
         issuer: "https://salsa.debian.org",
-        wellKnown: "https://salsa.debian.org/.well-known/openid-configuration",
+        token: "https://salsa.debian.org/oauth/token",
+        userinfo: "https://salsa.debian.org/oauth/userinfo",
+        jwks_endpoint: "https://salsa.debian.org/oauth/discovery/keys",
         authorization: { parmas: { scope: "read_api read_user openid email profile" } },
         profile(profile) {
             return {
               id: profile.id.toString(),
-              name: profile.name ?? profile.username,
+              name: profile.name,
               email: profile.email,
               image: profile.avatar_url,
             }
