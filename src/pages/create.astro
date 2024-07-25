@@ -112,9 +112,13 @@ if (hostEmail !== undefined && hostEmail !== null && Astro.request.method === "P
                 session && session.user && session.user.email ? <div>
                     <form method="POST">
                         <label>Host: {session.user.email}</label>
+                        <br/>
                         <label>Guest 1: <input type="email" name="guest1" required/></label>
+                        <br/>
                         <label>Guest 2: <input type="email" name="guest2" required/></label>
+                        <br/>
                         <label>Guest 3: <input type="email" name="guest3" required/></label>
+                        <br/>
                         <button>Create session</button>
                     </form>
                 </div> : <div>
