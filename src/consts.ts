@@ -9,29 +9,6 @@ export const SITE: Site = {
 };
 
 export const HOME: Metadata = {
-  TITLE: "NEWSNIPER 메인 페이지",
-  DESCRIPTION: "Astro Micro is an accessible theme for Astro.",
+  TITLE: "NEWSNIPER DebConf24 BoF Session - the Revised Landlord's Game",
+  DESCRIPTION: "with 희년함께",
 };
-
-export const ARTICLES: Metadata = {
-  TITLE: "게시물",
-  DESCRIPTION:
-    "기사/영상 등 컨텐츠들",
-};
-
-export const SERIES: Metadata = {
-  TITLE: "Series",
-  DESCRIPTION:
-    "연재 기획",
-};
-
-export const SOCIALS: Socials = [
-  {
-    NAME: "YouTube",
-    HREF: "https://www.youtube.com/@newsniper_ybi",
-  },
-  {
-    NAME: "Instagram",
-    HREF: "https://www.instagram.com/newsniper_ybi",
-  }
-];
