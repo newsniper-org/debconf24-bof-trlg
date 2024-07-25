@@ -1,0 +1,26 @@
+---
+import BackToPrevious from "@/components/BackToPrevious.astro";
+import CodeSnippetCopy from "@/components/CodeSnippetCopy.astro";
+import Container from "@/components/Container.astro";
+import Link from "@/components/Link.astro";
+import Layout from "@/layouts/Layout.astro";
+
+const gameId = Astro.params.gameId
+
+const codeToCopy = `<iframe src="https://debconf24-bof.newsniper.org/game/${gameId}/embed/" height="360"/>`
+
+---
+
+
+<Layout title={`${gameId} gameboard`} description={`the gameboard view of the game session ${gameId}`}>
+    <Container>
+        <div class="animate">
+            <BackToPrevious href={`/`}>Back to main page</BackToPrevious>
+        </div>
+        {(gameId !== undefined) && (
+            <Link href={`/game/${gameId}/watch`}>Watch the board</Link>
+            <Link href={`/game/${gameId}/play`}>Join the play room</Link>
+            <CodeSnippetCopy snippet={codeToCopy}/>
+        )}
+    </Container>
+</Layout>

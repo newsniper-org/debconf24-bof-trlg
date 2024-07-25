@@ -1,0 +1,19 @@
+---
+import BackToPrevious from "@/components/BackToPrevious.astro";
+import Container from "@/components/Container.astro";
+import WrappedGameView from "@/components/trlg/WrappedGameView";
+import Layout from "@/layouts/Layout.astro";
+
+
+const {gameId} = Astro.params
+
+---
+<Layout title={`${gameId} gameboard`} description={`the gameboard view of the game session ${gameId}`}>
+    <Container>
+        <div class="animate">
+            <BackToPrevious href={`/${gameId}/`}>Back to lobby</BackToPrevious>
+        </div>
+        {(gameId !== undefined) && <WrappedGameView client:only gameId={gameId}/>}
+    </Container>
+</Layout>
+

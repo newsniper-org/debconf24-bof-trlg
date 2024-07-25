@@ -1,0 +1,17 @@
+---
+import type { Session } from '@auth/core/types'
+
+
+interface Props {
+    session: Session
+}
+
+const { session } = Astro.props
+---
+<div>
+    {session.user && <>
+        {session.user.image && <img src={session.user.image}/>}
+        {session.user.email && <p>{session.user.email}</p>}
+    </>}
+</div>
+

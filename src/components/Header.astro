@@ -1,0 +1,36 @@
+---
+import Container from "@/components/Container.astro";
+import Link from "@/components/Link.astro";
+import SiteLogo from "@/components/SiteLogo.astro";
+
+import type { Session } from "@auth/core/types";
+import { Auth, SignIn } from "auth-astro/components"
+import StyledSignOut from "@/components/StyledSignOut.astro";
+import Account from "@/components/Account.astro";
+
+---
+
+<header transition:persist>
+  <Container>
+    <div class="flex flex-wrap justify-between gap-y-2">
+      <Link href="/" underline={false}>
+        <div class="site__logo-container">
+          <SiteLogo />
+        </div>
+      </Link>
+      <nav class="flex items-center gap-1 text-sm">
+        <Link href="https://newsniper.org/">Main page</Link>
+        <span>
+          {`/`}
+        </span>
+        <Auth>
+          {(session: Session) => (
+            (session ? <>
+              <Account session={session}/><span>{`|`}</span><StyledSignOut>Logout</StyledSignOut>
+            </> : <SignIn provider="debian-salsa">Login</SignIn>)
+          )}
+        </Auth>
+      </nav>
+    </div>
+  </Container>
+</header>

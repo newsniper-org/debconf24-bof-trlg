@@ -1,0 +1,30 @@
+---
+import BackToPrevious from "@/components/BackToPrevious.astro";
+import Container from "@/components/Container.astro";
+import WrappedGameControlView from "@/components/trlg/WrappedGameControlView";
+import Layout from "@/layouts/Layout.astro";
+import type { Session } from "@auth/core/types";
+import { Auth, SignIn } from "auth-astro/components"
+
+const gameId = Astro.params.gameId
+
+---
+
+
+<Layout title={`${gameId} gameboard`} description={`the gameboard view of the game session ${gameId}`}>
+    <Container>
+        <div class="animate">
+            <BackToPrevious href={`/${gameId}/`}>Back to lobby</BackToPrevious>
+        </div>
+        {(gameId !== undefined) && <Auth>
+            {(session: Session) => 
+                (session ? <div>
+                    <WrappedGameControlView client:only gameId={gameId} session={session}/>
+                </div> : <div>
+                    You need to Login as one of the players
+                </div>)
+            }
+        </Auth>}
+    </Container>
+</Layout>
+

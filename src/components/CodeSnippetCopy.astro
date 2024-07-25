@@ -1,0 +1,32 @@
+---
+
+interface Props {
+    snippet: string
+}
+
+const {snippet} = Astro.props
+
+---
+<code-snippet-copy data-snippet={snippet}>
+    <div style={{display: "inline-block", verticalAlign: "middle"}}>
+        <button id="btn-copy-snippet">Copy the iframe code snippet to embed</button>
+        <pre><code>{snippet}</code></pre>
+    </div>
+</code-snippet-copy>
+
+<script>
+    class CodeSnippetCopy extends HTMLElement {
+        constructor() {
+            super();
+
+            const snippet = this.dataset.snippet
+            const button = this.querySelector("#btn-copy-snippet") as HTMLButtonElement
+            button.addEventListener("click",async (ev) => {
+                if(snippet !== undefined) {
+                    await navigator.clipboard.writeText(snippet)
+                }
+            })
+        }
+    }
+    customElements.define("code-snippet-copy", CodeSnippetCopy)
+</script>
