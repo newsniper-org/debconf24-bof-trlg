@@ -13,7 +13,6 @@ export default function DebianSalsa<P extends GitLabProfile> ({clientId, clientS
         authorization: { parmas: { scope: "read_api read_user openid email profile" } },
         profile(profile) {
             return {
-              id: profile.id.toString(),
               name: profile.name,
               email: profile.email,
               image: profile.avatar_url,
