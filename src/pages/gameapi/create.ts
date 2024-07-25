@@ -1,12 +1,5 @@
+import { redis } from "@/lib/redis";
 import type { APIRoute } from "astro";
-
-import { Redis } from "@upstash/redis"
-
-const redis = new Redis({
-    url: import.meta.env.UPSTASH_REDIS_REST_URL,
-    token: import.meta.env.UPSTASH_REDIS_REST_TOKEN
-})
-
 
 function randomAvoidingGivenIds(given: string[], generator: () => string) {
     let generated: string

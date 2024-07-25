@@ -1,11 +1,12 @@
 ---
+import type { GetStaticPaths } from "astro";
 import BackToPrevious from "@/components/BackToPrevious.astro";
 import CodeSnippetCopy from "@/components/CodeSnippetCopy.astro";
 import Container from "@/components/Container.astro";
 import Link from "@/components/Link.astro";
 import Layout from "@/layouts/Layout.astro";
 
-const gameId = Astro.params.gameId
+const {gameId} = Astro.params
 
 const codeToCopy = `<iframe src="https://debconf24-bof.newsniper.org/game/${gameId}/embed/" height="360"/>`
 
