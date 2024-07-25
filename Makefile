@@ -4,4 +4,4 @@ prepare-astro:
 build:
 	npm run build
 
-netlify: prepare-astro
+netlify: prepare-astro build
