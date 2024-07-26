@@ -58,12 +58,13 @@ export default class UpstashRedisAdapter implements StorageAdapter<true> {
             let id_result: "OK" | "NO_NEED" | null
             const id_list = await this.redis.json.get<string[]>("id", "$")
             if(id_list === null) {
-                id_result = await this.redis.json.set("id","$", new Array<string>(this.gameId))
+                let arrappend_result = await this.redis.json.arrappend("id","$",this.gameId)
+                id_result = (arrappend_result.length > 0 && !(arrappend_result.includes(null))) ? "OK" : null
             } else if(id_list.includes(this.gameId)) {
                 id_result = "NO_NEED"
             } else {
-                const updated = id_list.concat(this.gameId)
-                id_result = await this.redis.json.set("id", "$", updated)
+                let arrappend_result = await this.redis.json.arrappend("id","$",this.gameId)
+                id_result = (arrappend_result.length > 0 && !(arrappend_result.includes(null))) ? "OK" : null
             }
 
             if(session_result === null || id_result === null) {

@@ -69,7 +69,7 @@ export const POST: APIRoute = async ({request}) => {
         const generated = randomAvoidingGivenIds(idList,() => {
             return Math.random().toString(36).substring(2,8)
         })
-        await redis.json.set("id", "$",generated.concat(generated))
+        await redis.json.arrappend("id", "$",generated)
 
         const init: {
             initialized: boolean,
