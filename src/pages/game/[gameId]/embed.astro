@@ -4,5 +4,5 @@ import EmbedLayout from "@/layouts/EmbedLayout.astro";
 const {gameId} = Astro.params
 ---
 <EmbedLayout title={`embedded ${gameId} gameboard`} description={`the embedded gameboard view of the game session ${gameId}`} >
-    {(gameId !== undefined) && <WrappedGameView client:only gameId={gameId}/>}
+    {(gameId !== undefined) && <WrappedGameView gameId={gameId}/>}
 </EmbedLayout>
