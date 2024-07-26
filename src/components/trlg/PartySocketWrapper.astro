@@ -1,0 +1,47 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+
+---
+
+<party-socket-wrapper data-gameId={gameId}>
+    <div id="inner"/>
+</party-socket-wrapper>
+
+
+<script>
+    import { TRLGClient } from "@/lib/trlg/socket";
+    import { initGameContext, type SerializedGameContext } from "@/lib/trlg/types";
+
+    let [
+        _state,
+        _isOnline,
+        _gameContext,
+        _playerId,
+        _nowPlayerAccount
+    ]: [string,boolean,SerializedGameContext, (0|1|2|3|null), string] = ["", false, initGameContext(),null, ""]
+
+    let _socket: TRLGClient | undefined
+
+    class PartySocketWrapper extends HTMLElement {
+        constructor() {
+            super()
+
+            _socket = new TRLGClient(
+                this.dataset.gameId as string,
+                (value) => {_state = value},
+                (value) => {_isOnline = value},
+                (value) => {_gameContext = value},
+                (value) => {_playerId = value},
+                (value) => {_nowPlayerAccount = value}
+            )
+        }
+    }
+    customElements.define("party-socket-wrapper", PartySocketWrapper)
+
+    const inner = document.querySelector("#inner") as HTMLDivElement
+    inner.setHTMLUnsafe(await Astro.slots.render('default', [{socket: _socket ?? null, _state, _isOnline, _gameContext, _playerId, _nowPlayerAccount}]))
+</script>

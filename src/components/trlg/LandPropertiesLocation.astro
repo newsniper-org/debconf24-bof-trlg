@@ -1,0 +1,51 @@
+---
+import type { SerializedLandProperties } from '@/lib/trlg/component-utils'
+import City from './City.astro'
+import Industrial from './Industrial.astro'
+
+
+interface Props {
+    lp: SerializedLandProperties
+}
+
+const {lp} = Astro.props
+
+---
+<>
+    {(lp[2] !== undefined) && <City status={lp[2]}/>}
+    {(lp[4] !== undefined) && <City status={lp[4]} transform={"translate(-100.00008,1.0074219e-5)"}/>}
+    {(lp[6] !== undefined) && <City status={lp[6]} transform={"translate(-200.00005,1.0074219e-5)"}/>}
+    {(lp[8] !== undefined) && <City status={lp[8]} transform={"translate(-300.00005,1.7230469e-5)"}/>}
+    
+    {(lp[11] !== undefined) && <City status={lp[11]} transform={"rotate(60,489.5887,443.59444)"}/>}
+    {(lp[12] !== undefined) && <City status={lp[12]} transform={"rotate(60,514.5876,400.29253)"}/>}
+    {(lp[13] !== undefined) && <City status={lp[13]} transform={"rotate(60,539.59157,356.98698)"}/>}
+    {(lp[15] !== undefined) && <City status={lp[15]} transform={"rotate(60,589.85736,270.54133)"}/>}
+    {(lp[17] !== undefined) && <City status={lp[17]} transform={"rotate(60,639.85523,183.93747)"}/>}
+
+    {(lp[20] !== undefined) && <City status={lp[20]} transform={"rotate(120,489.68215,443.73965)"}/>}
+    {(lp[22] !== undefined) && <City status={lp[22]} transform={"rotate(120,539.67996,414.87341)"}/>}
+    {(lp[24] !== undefined) && <City status={lp[24]} transform={"rotate(120,589.68118,386.0088)"}/>}
+    {(lp[25] !== undefined) && <City status={lp[25]} transform={"rotate(120,614.68243,371.57404)"}/>}
+    {(lp[26] !== undefined) && <City status={lp[26]} transform={"rotate(120,639.68149,357.1412)"}/>}
+    
+    {(lp[29] !== undefined) && <City status={lp[29]} transform={"rotate(180,489.58999,443.59)"}/>}
+    {(lp[30] !== undefined) && <City status={lp[30]} transform={"rotate(180,514.57676,443.58999)"}/>}
+    {(lp[32] !== undefined) && <City status={lp[32]} transform={"rotate(180,564.58998,443.59)"}/>}
+    {(lp[33] !== undefined) && <City status={lp[33]} transform={"rotate(180,589.59001,443.58999)"}/>}
+    {(lp[34] !== undefined) && <City status={lp[34]} transform={"rotate(180,614.59001,443.58999)"}/>}
+    {(lp[35] !== undefined) && <Industrial status={lp[35]} transform={"rotate(180,639.59001,443.58999)"}/>}
+
+    {(lp[38] !== undefined) && <City status={lp[38]}/>}
+    {(lp[39] !== undefined) && <Industrial status={lp[39]}/>}
+    {(lp[40] !== undefined) && <City status={lp[40]} transform={"rotate(-120,539.58482,472.45496)"}/>}
+    {(lp[42] !== undefined) && <City status={lp[42]} transform={"rotate(-120,589.58954,501.32186)"}/>}
+    {(lp[43] !== undefined) && <City status={lp[43]}  transform={"rotate(-120,614.58954,515.75562)"}/>}
+    {(lp[44] !== undefined) && <Industrial status={lp[44]} transform={"rotate(-120,639.58954,530.18938)"}/>}
+
+    {(lp[47] !== undefined) && <City status={lp[47]} transform={"rotate(-60,489.59967,443.59121)"}/>}
+    {(lp[48] !== undefined) && <City status={lp[48]} transform={"rotate(-60,514.58648,486.86957)"}/>}
+    {(lp[49] !== undefined) && <City status={lp[49]} transform={"rotate(-60,539.59212,530.19062)"}/>}
+    {(lp[51] !== undefined) && <City status={lp[51]} transform={"rotate(-60,589.59973,616.79633)"}/>}
+    {(lp[53] !== undefined) && <City status={lp[53]} transform={"rotate(-60,639.59973,703.39889)"}/>}
+</>
