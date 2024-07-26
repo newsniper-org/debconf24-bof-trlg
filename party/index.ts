@@ -158,6 +158,11 @@ export default class TRLGServer implements Party.Server {
             }
         }
     }
+
+    static async onBeforeConnect(request: Party.Request, lobby: Party.Lobby) {
+        request.headers.set("Access-Control-Allow-Origin", "*")
+        return request        
+    }
 }
 
 TRLGServer satisfies Party.Worker

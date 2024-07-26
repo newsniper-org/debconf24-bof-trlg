@@ -10,5 +10,10 @@ export default defineConfig({
   site: "https://debconf24-bof.newsniper.org/",
   integrations: [tailwind(), qwikdev(), auth()],
   output: "server",
+  server: {
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    }
+  },
   adapter: vercel()
 });
