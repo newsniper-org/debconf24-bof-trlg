@@ -67,7 +67,7 @@ if (hostEmail !== undefined && hostEmail !== null && Astro.request.method === "P
       dupErrors.guestEmail1 = dupErrors.guestEmail2 = dupErrors.guestEmail3 = ""
     }
     const hasErrors = Object.values(errors).some(msg => msg.length > 0)
-    const hasDupErrors = Object.values(dupErrors).some(msg => msg)
+    const hasDupErrors = Object.values(dupErrors).some(msg => msg.length > 0)
     if((!hasErrors) && (!hasDupErrors)) {
       const response = await fetch("/gameapi/create",
         {
