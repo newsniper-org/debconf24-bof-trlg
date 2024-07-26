@@ -1,5 +1,6 @@
 import PartySocket from 'partysocket';
 import type { SerializedGameContext } from './types';
+import WS from 'ws';
 
 function initGameContext(): SerializedGameContext {
     return {
@@ -211,6 +212,7 @@ export class TRLGClient {
         this.socket = new PartySocket({
             host: import.meta.env.NEXT_PUBLIC_PARTYKIT_URL,
             room: `${gameId}`,
+            WebSocket: WS
         });
         this._state = ""
 
