@@ -12,7 +12,7 @@ const {gameId} = Astro.params
         <div class="animate">
             <BackToPrevious href={`/game/${gameId}/`}>Back to lobby</BackToPrevious>
         </div>
-        {(gameId !== undefined) && <WrappedGameView gameId={gameId}/>}
+        {(gameId !== undefined) && <WrappedGameView client:load gameId={gameId}/>}
     </Container>
 </Layout>
 
