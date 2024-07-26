@@ -18,8 +18,8 @@ const { gameId } = Astro.props
 
 <script>
     import { rooms, tryConnect, type RoomDataType } from "@/store"
-import GameView from "./GameView.astro"
-import { TRLGClient } from "@/lib/trlg/socket"
+    import GameView from "./GameView.astro"
+    import { TRLGClient } from "@/lib/trlg/socket"
     class WrappedGameView extends HTMLElement {
         updateValue<K extends keyof RoomDataType>(key: K, value: RoomDataType[K]) {
             rooms.get()[this.gameId][key] = value
@@ -44,4 +44,5 @@ import { TRLGClient } from "@/lib/trlg/socket"
             }))
         }
     }
+    customElements.define("wrapped-game-view", WrappedGameView)
 </script>
