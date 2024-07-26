@@ -1,8 +1,8 @@
 ---
 import { TRLGClient } from "@/lib/trlg/socket";
-import PartySocketWrapper from "./PartySocketWrapper.astro";
+import PartySocketWrapper from "@/components/trlg/PartySocketWrapper.astro";
 import type { SerializedGameContext } from "@/lib/trlg/types";
-import GameView from "./GameView.astro";
+import GameView from "@/components/trlg/GameView.astro";
 
 interface Props {
     gameId: string

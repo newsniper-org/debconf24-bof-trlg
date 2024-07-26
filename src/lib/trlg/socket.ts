@@ -159,9 +159,8 @@ export class TRLGClient {
         this.updateNowPlayerAccount(value)
     }
 
-    private onJoinFailed(message?: string) {
-        const postfix = message ? `: ${message}` : ""
-        console.log(`Failed to join the room ${this.gameId}${postfix}`)
+    private onError() {
+        console.log(`Error in the room ${this.gameId}`)
     }
 
     private onRefresh(state: string, gameContext: SerializedGameContext, nowPlayerAccount: string) {
@@ -217,6 +216,7 @@ export class TRLGClient {
 
         this.socket.addEventListener("open", (event) => {
             console.log(`Connected to PartySocket server`)
+            this.onJoinSucceed()
         })
 
         this.socket.addEventListener("close", (event) => {
@@ -228,12 +228,6 @@ export class TRLGClient {
         this.socket.addEventListener("message", (event) => {
             const message = JSON.parse(event.data);
             switch(message.type) {
-                case "joinFailed":
-                    this.onJoinFailed(message.value.message)
-                    break;
-                case "joinSucceed":
-                    this.onJoinSucceed()
-                    break;
                 case "refresh":
                     let state: string = message.value.state
                     let gameContext: SerializedGameContext = message.value.gameContext
@@ -251,6 +245,8 @@ export class TRLGClient {
                     break;
             }
         })
+
+        this.socket.addEventListener("error", () => {this.onError()})
     }
     
     public grant(accountEmail: string) {

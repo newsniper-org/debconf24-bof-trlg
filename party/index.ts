@@ -5,6 +5,13 @@ import UpstashRedisAdapter from 'party/lib/trlg/storage-adapters/upstash-redis';
 import { AsyncGuardedExecuter, AsyncGuardedUnionMappedWeakExecuter, GuardedExecuter, GuardedUnionMappedWeakExecuter, type IAsyncGuardedExecuter, type IGuardedExecuter } from 'party/lib/trlg/utils';
 import type * as Party from 'partykit/server';
 
+
+const CORS = {
+    "Access-Control-Allow-Origin": ["newsniper.org", "*.newsniper.org"],
+    "Access-Control-Allow-Methods": ["GET", "POST"],
+    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
+};
+
 export default class TRLGServer implements Party.Server {
     private readonly gameId: string
 
@@ -20,7 +27,6 @@ export default class TRLGServer implements Party.Server {
         this.env = {
             ...room.env
         }
-        
     }
 
     private async trigger(event: EventType) {

@@ -1,8 +1,8 @@
 ---
 import type { TRLGClient } from '@/lib/trlg/socket';
 import { mapQuadruplet, type SerializedGameContext } from '@/lib/trlg/types';
-import StatusDisplay from './StatusDisplay.astro';
-import GameBoard from '@/components/trlg/GameBoard.astro';
+import StatusDisplay from './StatusDisplay.astro'
+import GameBoard from './GameBoard.astro';
 
 
 interface Props {
@@ -28,8 +28,9 @@ const {
 const pls = mapQuadruplet(players,(player) => player.location)
 ---
 
-<div style={{display: "flex"}}>
-    <div style={{float: "left"}}>
+<div style={{display: "inline-block"}}>
+    <br/>
+    <div>
         <GameBoard 
             p0={pls[0]}
             p1={pls[1]}
@@ -40,6 +41,7 @@ const pls = mapQuadruplet(players,(player) => player.location)
             landProperties={landProperties}
             isOnline={isOnline} />
     </div>
+    <br/><br/>
     <div>
         <StatusDisplay
             gameContext={gameContext}
