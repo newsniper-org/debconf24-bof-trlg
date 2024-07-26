@@ -19,7 +19,7 @@ const {gameId} = Astro.params
         {(gameId !== undefined) && <Auth>
             {(session: Session) => 
                 (session ? <div>
-                    <WrappedGameControlView client:load gameId={gameId} session={session}/>
+                    <WrappedGameControlView client:only="qwik" gameId={gameId} session={session}/>
                 </div> : <div>
                     You need to Login as one of the players
                 </div>)
