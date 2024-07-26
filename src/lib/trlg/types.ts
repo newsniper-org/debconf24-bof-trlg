@@ -356,3 +356,105 @@ export function amountSum(salesCommand: SalesType) {
     const amount = Array.from(salesCommand.entries()).reduce((acc, [_, a]) => acc+a, 0)
     return amount
 }
+
+export function initGameContext(): SerializedGameContext {
+    return {
+        mainStatuses: {
+            players: [
+                {
+                    cash: 3000000,
+                    location: 0,
+                    remaining: {
+                        jailTurns: 0,
+                        tickets: {
+                            feeExemption: 0,
+                            taxExemption: 0,
+                            bonus: 0,
+                            doubleLotto: 0,
+                            lawyer: 0,
+                            freeHospital: 0
+                        }
+                    },
+                    cycle: 0,
+                    univEducation: 0
+                },
+                {
+                    cash: 3000000,
+                    location: 0,
+                    remaining: {
+                        jailTurns: 0,
+                        tickets: {
+                            feeExemption: 0,
+                            taxExemption: 0,
+                            bonus: 0,
+                            doubleLotto: 0,
+                            lawyer: 0,
+                            freeHospital: 0
+                        }
+                    },
+                    cycle: 0,
+                    univEducation: 0
+                },
+                {
+                    cash: 3000000,
+                    location: 0,
+                    remaining: {
+                        jailTurns: 0,
+                        tickets: {
+                            feeExemption: 0,
+                            taxExemption: 0,
+                            bonus: 0,
+                            doubleLotto: 0,
+                            lawyer: 0,
+                            freeHospital: 0
+                        }
+                    },
+                    cycle: 0,
+                    univEducation: 0
+                },
+                {
+                    cash: 3000000,
+                    location: 0,
+                    remaining: {
+                        jailTurns: 0,
+                        tickets: {
+                            feeExemption: 0,
+                            taxExemption: 0,
+                            bonus: 0,
+                            doubleLotto: 0,
+                            lawyer: 0,
+                            freeHospital: 0
+                        }
+                    },
+                    cycle: 0,
+                    univEducation: 0
+                }
+            ],
+            landProperties: {
+                locations: [],
+                map: {}
+            },
+            govIncome: 0,
+            cashCache: null
+        },
+        turns: 0,
+        dicesNow: null,
+        dicesSecondary: null,
+        fund: 0,
+        ending: null,
+        financialWarningCache: null,
+        nowPid: 0,
+        remainingSidecars: {
+            catastrophe: 0,
+            pandemic: 0
+        },
+        freshChanceCardCache: null,
+        lottoTriesCountCache: 0,
+        doubleLotto: null,
+        lottoCache: null,
+        feeCache: 0,
+        maxPurchasableAmountCache: 0,
+        wonLotto: null,
+        jailTurnResultCache: null
+    }
+}
