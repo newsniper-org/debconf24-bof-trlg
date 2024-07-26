@@ -1,0 +1,117 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+---
+<lotto-modal data-gameId={gameId}>
+    <p id="doubleChanceDisplay"/>
+    <p id="triesCountDisplay"/>
+    <br/>
+    <div>
+        <input type="radio" id="bothOdd" name="lottoChoice" value="bothOdd"><label>둘 다 홀수</label><br/>
+        <input type="radio" id="oddEven" name="lottoChoice" value="oddEven" checked={true}/><label>홀/짝 각각 하나씩</label><br/>
+        <input type="radio" id="bothEven" name="lottoChoice" value="bothEven"/><label>둘 다 짝수</label>
+    </div>
+    <br/>
+    <button id="tryBtn">
+        도전!
+    </button>
+    <button id="stopBtn">
+        멈춰!
+    </button>
+</lotto-modal>
+
+<script>
+    import { filterMyLandProps, updateButtons } from "@/lib/trlg/component-utils"
+    import { TRLGClient } from "@/lib/trlg/socket"
+    import { _CITY_GROUPS, amountSum, BUILDABLE_LOCATIONS, initGameContext, parseSalesCommand, type CityGroupType, type EventType, type LandPropSaleType, type LottoChoiceType, type SerializedGameContext } from "@/lib/trlg/types"
+    import { rooms, sockets } from "@/store"
+
+    import { ModalOrNoticeBase } from "@/lib/trlg/types"
+
+    import type { ElementEventPair, ValuesType, UpdateReturnType } from "@/lib/trlg/types"
+
+
+
+    function lottoUpdate(choices: NodeListOf<HTMLElement> ,value: ValuesType): [...UpdateReturnType, boolean] {
+        let chosen: LottoChoiceType = "oddEven"
+        choices.forEach((choice) => {
+            const radio = (choice as HTMLInputElement)
+            if(radio.checked) {
+                switch(radio.value) {
+                    case "bothOdd":
+                        chosen = "bothOdd"
+                        break;
+                    case "oddEven":
+                        chosen = "oddEven"
+                        break;
+                    case "bothEven":
+                        chosen = "bothEven"
+                        break;
+                }
+            }
+        })
+
+        const {
+            mainStatuses: {
+                players,
+                cashCache
+            },
+            nowPid,
+            lottoTriesCountCache
+        } = value.gameContext
+
+        const cash = cashCache ?? players[nowPid].cash
+
+        return [cash < 200000, {type: "tryLotto", choice: chosen}, lottoTriesCountCache === 0]
+    }
+
+    class LottoModal extends ModalOrNoticeBase {
+        unableToSubmit: boolean
+        event: EventType
+        unableToStopLotto: boolean
+        constructor() {
+            super();
+
+            (this.querySelector("#doubleChanceDisplay") as HTMLParagraphElement).replaceChildren("두배 찬스 " + ((rooms.get()[this.gameId].gameContext.doubleLotto === true) ? "사용" : "미사용"));
+            (this.querySelector("#triesCountDisplay") as HTMLParagraphElement).replaceChildren(`${rooms.get()[this.gameId].gameContext.lottoTriesCountCache === 0 ? "첫" : rooms.get()[this.gameId].gameContext.lottoTriesCountCache === 1 ? "두" : "세"}번째 도전?`)
+            let lottoChoices: NodeListOf<HTMLElement> = document.getElementsByName("lottoChoice");
+            
+            [this.unableToSubmit, this.event, this.unableToStopLotto] = lottoUpdate(lottoChoices, rooms.get()[this.gameId]);
+            
+            const tryBtn = this.querySelector("#tryBtn") as HTMLButtonElement
+            tryBtn.disabled = this.unableToSubmit
+            const stopBtn = this.querySelector("#stopBtn") as HTMLButtonElement
+            stopBtn.disabled = this.unableToStopLotto
+            updateButtons([tryBtn, () => {
+                if (this.event && this.event.type === "tryLotto") {
+                    sockets[this.gameId].emit("tryLotto", {choice: this.event.choice})
+                }
+            }], [stopBtn, () => {
+                sockets[this.gameId].emitWithoutValue("stopLotto")
+            }])
+
+            lottoChoices.forEach((choice) => {
+                const radio = (choice as HTMLInputElement)
+                radio.addEventListener("change", () => {
+                    if(radio.checked) {
+                        switch(radio.value) {
+                            case "bothOdd":
+                                this.event = {type: "tryLotto", choice: "bothOdd"}
+                                break;
+                            case "oddEven":
+                                this.event = {type: "tryLotto", choice: "oddEven"}
+                                break;
+                            case "bothEven":
+                                this.event = {type: "tryLotto", choice: "bothEven"}
+                                break;
+                        }
+                    }
+                })
+            })
+        }
+    }
+    customElements.define("lotto-modal", LottoModal)
+</script>

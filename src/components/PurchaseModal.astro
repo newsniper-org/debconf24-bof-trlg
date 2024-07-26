@@ -1,0 +1,79 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+---
+<purchase-modal data-gameId={gameId}>
+    <input id="purchaseInput" type="range" value={1} step={1} min={1}/>
+    <br/>
+    <button id="submitBtn">
+        구매
+    </button>
+</purchase-modal>
+
+<script>
+    import { filterMyLandProps, updateButtons } from "@/lib/trlg/component-utils"
+    import { TRLGClient } from "@/lib/trlg/socket"
+    import { _CITY_GROUPS, amountSum, BUILDABLE_LOCATIONS, initGameContext, parseSalesCommand, type CityGroupType, type EventType, type LandPropSaleType, type LottoChoiceType, type SerializedGameContext } from "@/lib/trlg/types"
+    import { rooms, sockets } from "@/store"
+
+    import { ModalOrNoticeBase } from "@/lib/trlg/types"
+
+    import type { ElementEventPair, ValuesType, UpdateReturnType } from "@/lib/trlg/types"
+
+    
+
+    class PurchaseModal extends ModalOrNoticeBase {
+        _amount: number = 0
+        input = this.querySelector("#purchaseInput") as HTMLInputElement
+        submitBtn = this.querySelector("#submitBtn") as HTMLButtonElement
+        get amount() {
+            return this._amount
+        }
+
+        _unableToSubmit: boolean = true
+
+        get unableToSubmit() {
+            return this._unableToSubmit
+        }
+
+        set unableToSubmit(value) {
+            this._unableToSubmit = value
+            this.submitBtn.disabled = value
+        }
+
+        set amount(value) {
+            this._amount = value
+            this.unableToSubmit = (this.nowCash < (value * 300000)) || (value < 1)
+        }
+
+        nowCash: number
+        constructor() {
+            super()
+            const {
+                mainStatuses: {
+                    players,
+                    cashCache
+                },
+                nowPid,
+                maxPurchasableAmountCache
+            } = rooms.get()[this.gameId].gameContext
+
+            this.nowCash = cashCache ?? players[nowPid].cash
+            this.input.max = `${maxPurchasableAmountCache}`
+
+            this.amount = this.input.valueAsNumber
+
+            this.input.addEventListener("change", (_) => {
+                this.amount = this.input.valueAsNumber
+            })
+
+            this.submitBtn.addEventListener("click", (_) => {
+                sockets[this.gameId].emit("purchase", {amount: this.amount})
+            })
+        }
+    }
+    customElements.define("purchase-modal", PurchaseModal)
+</script>

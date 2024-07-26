@@ -1,0 +1,132 @@
+---
+import { rooms, sockets } from "@/store"
+import ExtinctionModal from "@/components/ExtinctionModal.astro"
+import GreenNewDealModal from "@/components/GreenNewDealModal.astro"
+import JailModal from "@/components/JailModal.astro"
+import LottoModal from "@/components/LottoModal.astro"
+import PreLottoModal from "@/components/PreLottoModal.astro"
+import MaintenanceSellModal from "@/components/MaintenanceSellModal.astro"
+import PurchaseModal from "@/components/PurchaseModal.astro"
+import QuickMoveModal from "@/components/QuickMoveModal.astro"
+import RollDiceModal from "./RollDiceModal.astro"
+import QuirkOfFateModal from "./QuirkOfFateModal.astro"
+import SellModal from "./SellModal.astro"
+import TradeModal from "./TradeModal.astro"
+import TrafficJamModal from "./TrafficJamModal.astro"
+import UseTicketModal from "./UseTicketModal.astro"
+import NoticeCheckButton from "./NoticeCheckButton.astro"
+import JailResultNotice from "./JailResultNotice.astro"
+import LottoFinalResultNotice from "./LottoFinalResultNotice.astro"
+import RankDisplay from "./RankDisplay.astro"
+import { getSession } from "auth-astro/server"
+
+
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+
+const {state, isOnline, gameContext, playerId, nowPlayerAccount} = rooms.get()[gameId]
+const fit = (playerId !== null) && (playerId === gameContext.nowPid)
+
+const COMMAND_STATES = [
+    "extinctionModal",
+    "greenNewDealModal",
+    "jailModal",
+    "lottoModal",
+    "preLottoModal",
+    "maintenanceSellModal",
+    "purchaseModal",
+    "quickMoveModal",
+    "quirkOfFateModal",
+    "rollDiceModal",
+    "sellModal",
+    "tradeModal",
+    "trafficJamModal",
+    "useTicketModal"
+]
+
+const NOTICE_STATES = [
+    "chanceKindNotice",
+    "jailResultNotice",
+    "lottoFinalResultNotice"
+]
+
+function checkView() {
+    if(COMMAND_STATES.includes(state)) {
+        return "COMMAND"
+    } else if (NOTICE_STATES.includes(state)) {
+        return "NOTICE"
+    } else if (state === "frozen") {
+        return "FROZEN"
+    } else {
+        return null
+    }
+}
+
+const checked = checkView()
+
+const userEmail = (await getSession(Astro.request))?.user?.email ?? ""
+---
+<div>
+    <wrapped-game-control-view data-gameId={gameId} data-userEmail={userEmail}> {(checked === "COMMAND") ? (
+        (fit) ? (
+            (state == "extinctionModal") ? <ExtinctionModal gameId={gameId}/> :
+            (state == "greenNewDealModal") ? <GreenNewDealModal gameId={gameId}/> :
+            (state == "jailModal") ? <JailModal gameId={gameId}/> :
+            (state === "lottoModal") ? <LottoModal gameId={gameId}/> :
+            (state === "preLottoModal") ? <PreLottoModal gameId={gameId}/> :
+            (state === "maintenanceSellModal") ? <MaintenanceSellModal gameId={gameId}/> :
+            (state === "purchaseModal") ? <PurchaseModal gameId={gameId}/> :
+            (state === "quickMoveModal") ? <QuickMoveModal gameId={gameId}/> :
+            (state === "quirkOfFateModal") ? <QuirkOfFateModal gameId={gameId}/> :
+            (state === "rollDiceModal") ? <RollDiceModal gameId={gameId}/> :
+            (state === "sellModal") ? <SellModal gameId={gameId}/> :
+            (state === "tradeModal") ? <TradeModal gameId={gameId}/> :
+            (state === "trafficJamModal") ? <TrafficJamModal gameId={gameId}/> :
+            (state === "useTicketModal") ? <UseTicketModal gameId={gameId}/> : <></>
+        ) : <div>당신의 턴이 아닙니다.</div>
+    ) : (checked === "NOTICE") ? (
+        <>  {
+                (state === "chanceKindNotice") ? <p>찬스 카드를 뽑으셨습니다.</p> :
+                (state === "jailResultNotice") ? <JailResultNotice jailTurnResultCache={gameContext.jailTurnResultCache}/> :
+                (state === "lottoFinalResultNotice") ? <LottoFinalResultNotice gameContext={gameContext}/> : <></>
+            }
+            {fit && <NoticeCheckButton gameId={gameId}/>}
+        </>
+    ) : (checked === "FROZEN") ? (
+        (gameContext.ending === "hasWinner") ? <RankDisplay gameContext={gameContext}/> : (gameContext.ending === "hasBankrupt") ? <div>All the players lost the game {"X("}</div>
+        : <div></div>
+    ) : <></>} </wrapped-game-control-view>
+</div>
+
+<script>
+    import { TRLGClient } from "@/lib/trlg/socket"
+    import { rooms, sockets, tryConnect, type RoomDataType } from "@/store"
+
+    import { ModalOrNoticeBase } from "@/lib/trlg/types"
+    
+    
+    class WrappedGameControlView extends ModalOrNoticeBase {
+        updateValue<K extends keyof RoomDataType>(key: K, value: RoomDataType[K]) {
+            rooms.get()[this.gameId][key] = value
+        }
+        userEmail: string
+        constructor() {
+            super()
+            tryConnect(this.gameId,new TRLGClient(
+                this.gameId,
+                (value) => {this.updateValue("state",value)},
+                (value) => {this.updateValue("isOnline",value)},
+                (value) => {this.updateValue("gameContext",value)},
+                (value) => {this.updateValue("playerId",value)},
+                (value) => {this.updateValue("nowPlayerAccount",value)}
+            ))
+            this.userEmail = this.dataset.userEmail as string
+            sockets[this.gameId].emit("grant", {gameId: this.gameId, account: this.userEmail})
+        }
+    }
+    customElements.define("wrapped-game-control-view", WrappedGameControlView)
+
+</script>

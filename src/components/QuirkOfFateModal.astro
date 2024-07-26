@@ -1,0 +1,27 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+---
+<quirk-of-fate-modal data-gameId={gameId}>
+    <button id="rollBtn">운명의 장난으로 누구와 얽히게 될까요?</button>
+</roll-dice-modal>
+<script>
+    import { sockets } from "@/store"
+
+    import { ModalOrNoticeBase } from "@/lib/trlg/types"
+
+    class QuirkOfFateModal extends ModalOrNoticeBase {
+        constructor() {
+            super()
+            const rollBtn = this.querySelector("#rollBtn") as HTMLButtonElement
+            rollBtn.addEventListener("click", (_) => {
+                sockets[this.gameId].emitWithoutValue("pickTargetPlayer")
+            })
+        }
+    }
+
+    customElements.define("quirk-of-fate-modal", QuirkOfFateModal)
+</script>

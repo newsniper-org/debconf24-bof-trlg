@@ -1,0 +1,89 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+---
+<sell-modal>
+    <input type="text" value={""} id="input"/>
+    <br/>
+    <button id="submitBtn">
+        sell
+    </button>
+</sell-modal>
+<script>
+    import { convertSalesCommand, filterMyLandProps } from "@/lib/trlg/component-utils"
+    import { _CITY_GROUPS, amountSum, parseSalesCommand } from "@/lib/trlg/types"
+    import { rooms, sockets } from "@/store"
+
+    import { ModalOrNoticeBase } from "@/lib/trlg/types"
+
+    import type { SalesType, PlayerStatus } from "@/lib/trlg/types"
+
+
+    class SellModal extends ModalOrNoticeBase {
+        input = this.querySelector("#input") as HTMLInputElement
+        submitBtn = this.querySelector("#submitBtn") as HTMLButtonElement
+        _salesCommand: SalesType
+        _targets: {location: number, amount: number}[]
+
+        nowCash: number
+        nowPlayer: PlayerStatus
+        invoice: number
+
+        get salesCommand() {
+            return this._salesCommand
+        }
+        set salesCommand(value) {
+            this._salesCommand = value
+            this._targets = Array.from(convertSalesCommand(value))
+        }
+
+        get targets() {
+            return this._targets
+        }
+
+        get totalAmount() {
+            return amountSum(this.salesCommand)
+        }
+
+        get unableToSubmit() {
+            return (!((this.nowCash + (this.totalAmount * 300000) - this.invoice) >= 0) || !(this.totalAmount > 0))
+        }
+
+        constructor() {
+            super()
+
+            const {
+                mainStatuses: {
+                    players,
+                    landProperties,
+                    cashCache
+                },
+                nowPid,
+                feeCache
+            } = rooms.get()[this.gameId].gameContext
+
+            this.nowPlayer = players[nowPid]
+            this.nowCash = this.nowPlayer.cash
+            this.invoice = ((cashCache !== null) ? (this.nowCash - cashCache) : 0) + feeCache
+
+            const nowMyLandProps = new Map([...filterMyLandProps(landProperties.locations,landProperties.map,nowPid)])
+
+            this._salesCommand = parseSalesCommand(this.input.value,nowMyLandProps)
+            this._targets = Array.from(convertSalesCommand(this._salesCommand))
+            this.submitBtn.disabled = this.unableToSubmit
+
+            this.input.addEventListener("change", (_) => {
+                this.salesCommand = parseSalesCommand(this.input.value,nowMyLandProps)
+                this.submitBtn.disabled = this.unableToSubmit
+            })
+            this.submitBtn.addEventListener("click", (_) => {
+                sockets[this.gameId].emit("sell", {targets: this.targets})
+            })
+        }
+    }
+
+    customElements.define("sell-modal", SellModal)
+</script>

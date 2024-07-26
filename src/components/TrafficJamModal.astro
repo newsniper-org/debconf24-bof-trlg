@@ -1,0 +1,51 @@
+---
+
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+---
+<traffic-jam-modal data-gameId={gameId}>
+    <p>자신이 건물을 가지고 있지 않은 도시(들) 중 원하는 곳의 건물 한 채를 철거합니다</p>
+    <input type="number" value={0} min={0} max={53} id="input"/><br/>
+    <button id="submitBtn">철거 시행</button>
+</traffic-jam-modal>
+
+<script>
+import { BUILDABLE_LOCATIONS, ModalOrNoticeBase } from "@/lib/trlg/types";
+import { rooms, sockets } from "@/store";
+
+
+    class TrafficJamModal extends ModalOrNoticeBase {
+        input = this.querySelector("#input") as HTMLInputElement
+        submitBtn = this.querySelector("#submitBtn") as HTMLButtonElement
+
+        targetLocation: number = this.input.valueAsNumber
+        landProperties
+        nowPid: 0|1|2|3
+
+        get correct0() {
+            return BUILDABLE_LOCATIONS.includes(this.targetLocation)
+        }
+        get correct1() {
+            return (this.targetLocation in this.landProperties) && (this.landProperties.map[this.targetLocation].operatorId !== this.nowPid)
+        }
+        get disabled() { return !(this.correct0 && this.correct1) }
+
+        constructor() {
+            super()
+            this.landProperties = rooms.get()[this.gameId].gameContext.mainStatuses.landProperties
+            this.nowPid = rooms.get()[this.gameId].gameContext.nowPid
+            this.submitBtn.disabled = this.disabled
+            this.input.addEventListener("change", (_) => {
+                this.targetLocation = this.input.valueAsNumber
+                this.submitBtn.disabled = this.disabled
+            })
+            this.submitBtn.addEventListener("click", (_) => {
+                sockets[this.gameId].emit("pickTargetLocation", {targetLocation: this.targetLocation})
+            })
+        }
+    }
+    customElements.define("traffic-jam-modal", TrafficJamModal)
+</script>

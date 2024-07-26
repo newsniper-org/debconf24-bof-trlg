@@ -1,0 +1,27 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+---
+<roll-dice-modal data-gameId={gameId}>
+    <button id="rollBtn">주사위 굴리기</button>
+</roll-dice-modal>
+<script>
+    import { sockets } from "@/store"
+
+    import { ModalOrNoticeBase } from "@/lib/trlg/types"
+
+    class RollDiceModal extends ModalOrNoticeBase {
+        constructor() {
+            super()
+            const rollBtn = this.querySelector("#rollBtn") as HTMLButtonElement
+            rollBtn.addEventListener("click", (_) => {
+                sockets[this.gameId].emitWithoutValue("rollDice")
+            })
+        }
+    }
+
+    customElements.define("roll-dice-modal", RollDiceModal)
+</script>

@@ -1,0 +1,28 @@
+---
+
+interface Props {
+    gameId: string
+}
+
+
+const { gameId } = Astro.props
+
+---
+<notice-check-button data-gamdId={gameId}>
+    <button id="confirm">확인</button>
+</notice-check-button>
+
+<script>
+    import { ModalOrNoticeBase } from "@/lib/trlg/types";
+    import { sockets } from "@/store";
+
+    class NoticeCheckButton extends ModalOrNoticeBase {
+        constructor() {
+            super();
+            (this.querySelector("#confirm") as HTMLButtonElement).addEventListener("click", (_) => {
+                sockets[this.gameId].emitWithoutValue("noticeChecked")
+            })
+        }
+    }
+    customElements.define("notice-check-button", NoticeCheckButton)
+</script>

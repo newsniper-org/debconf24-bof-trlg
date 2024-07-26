@@ -1,0 +1,88 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+---
+
+<jail-modal data-gameId={gameId}>
+    <p id="lawyerTicketsDisplay"/>
+    <br/>
+    <button id="lawyerBtn">
+        변호사의 도움을 받기
+    </button>
+    <button id="moneyBtn">
+        보석금 내고 풀려나기
+    </button>
+    <button id="luckBtn">
+        운빨을 노려보기
+    </button>
+</jail-modal>
+
+<script>
+    import { filterMyLandProps, updateButtons } from "@/lib/trlg/component-utils"
+    import { TRLGClient } from "@/lib/trlg/socket"
+    import { _CITY_GROUPS, amountSum, BUILDABLE_LOCATIONS, initGameContext, parseSalesCommand, type CityGroupType, type EventType, type LandPropSaleType, type LottoChoiceType, type SerializedGameContext } from "@/lib/trlg/types"
+    import { rooms, sockets } from "@/store"
+
+    import { ModalOrNoticeBase } from "@/lib/trlg/types"
+
+    import type { ElementEventPair, ValuesType, UpdateReturnType } from "@/lib/trlg/types"
+
+    function jailUpdate(value: ValuesType, callback: () => void): [EventType, ...UpdateReturnType, ...UpdateReturnType] {
+        const {
+            mainStatuses: { players },
+            nowPid
+        } = value.gameContext
+
+        const {
+            cash,
+            remaining: { tickets: { lawyer } }
+        } = players[nowPid]
+
+        const lawyerTickets = Math.max(0,lawyer)
+        const lawyerDisabled = !(lawyerTickets !== 0)
+        callback()
+        return [{type: "rollDice"}, !(cash >= 400000), {type: "showMeTheMONEY"}, lawyerDisabled, {type: "thanksToLawyer"}]
+    }
+
+    
+
+    class JailModal extends ModalOrNoticeBase {
+        event: EventType
+        DONT$howMeTheMoney: boolean
+        additionalEvent1: EventType
+        impossibleLawyer: boolean
+        additionalEvent2: EventType
+        constructor() {
+            super()
+
+            const luckBtn = this.querySelector("#luckBtn") as HTMLButtonElement
+            const moneyBtn = this.querySelector("#moneyBtn") as HTMLButtonElement
+            const lawyerBtn = this.querySelector("#lawyerBtn") as HTMLButtonElement
+
+            (this.querySelector("#lawyerTicketsDisplay") as HTMLParagraphElement).replaceChildren(`변호사 호출 티켓 보유량 : ${Math.max(0,rooms.get()[this.gameId].gameContext.mainStatuses.players[rooms.get()[this.gameId].gameContext.nowPid].remaining.tickets.lawyer)}`);         
+            [this.event, this.DONT$howMeTheMoney, this.additionalEvent1, this.impossibleLawyer, this.additionalEvent2] = jailUpdate(rooms.get()[this.gameId],
+                () => {
+                    updateButtons(
+                        [luckBtn,() => {
+                            sockets[this.gameId].emitWithoutValue("rollDice")
+                        }],
+                        [moneyBtn, () => {
+                            sockets[this.gameId].emitWithoutValue("showMeTheMONEY")
+                        }],
+                        [lawyerBtn, () => {
+                            sockets[this.gameId].emitWithoutValue("thanksToLawyer")
+                        }]
+                    )
+                }
+            )
+
+            moneyBtn.disabled = this.DONT$howMeTheMoney
+            lawyerBtn.disabled = this.impossibleLawyer
+        }
+
+    }
+    customElements.define("jail-modal", JailModal)
+</script>

@@ -223,7 +223,7 @@ export class TRLGClient {
         });
 
         this.socket.on("disconnect",() => {
-            console.log(`Disconnected to PartySocket server`)
+            console.log(`Disconnected to Socket.IO server`)
             this._playerId = null
             this._isOnline = false
         })

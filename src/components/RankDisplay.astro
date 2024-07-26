@@ -1,0 +1,33 @@
+---
+import { getRanks, type RankType } from '@/lib/trlg/component-utils'
+import type { SerializedGameContext } from '@/lib/trlg/types'
+
+
+interface Props {
+    gameContext: SerializedGameContext
+}
+
+const { gameContext } = Astro.props
+const ranks = getRanks(gameContext)
+
+function decorateRank(rank: RankType) {
+    switch(rank) {
+        case 1:
+            return "1st"
+        case 2:
+            return "2nd"
+        case 3:
+            return "3rd"
+        case 4:
+            return "4th"
+    }
+}
+
+---
+<div style={{display: "inline-block"}}>
+    <p>player 0: {decorateRank(ranks[0])}</p>
+    <p>player 1: {decorateRank(ranks[1])}</p>
+    <p>player 2: {decorateRank(ranks[2])}</p>
+    <p>player 3: {decorateRank(ranks[3])}</p>
+</div>
+

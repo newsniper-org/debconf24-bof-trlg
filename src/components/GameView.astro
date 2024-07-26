@@ -1,11 +1,10 @@
 ---
-import type { TRLGClient } from '@/lib/trlg/socket';
 import { mapQuadruplet, type SerializedGameContext } from '@/lib/trlg/types';
-import StatusDisplay from './StatusDisplay.astro'
-import GameBoard from './GameBoard.astro';
+import StatusDisplay from '@/components/StatusDisplay.astro'
+import GameBoard from '@/components/GameBoard.astro';
 
 
-interface Props {
+export interface Props {
     isOnline: boolean;
     gameContext: SerializedGameContext;
     nowPlayerAccount: string

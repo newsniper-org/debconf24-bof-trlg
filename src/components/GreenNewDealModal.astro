@@ -1,0 +1,59 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+---
+<green-new-deal-modal data-gameId={gameId}>
+    <p>자신이 건물을 가지고 있는 도시(들) 중 한 곳에 무상으로 건물 한 채를 증설합니다.</p>
+    <p>(지나온 사이클 횟수에 따른 건설 제한과 무관하게 증설 가능합니다.)</p><br/>
+    <input id="greenNewDealInput" type="number" value={0} min={0} max={53}/><br/>
+    <button id="submitBtn">증설공사 시행</button>
+</green-new-deal-modal>
+
+<script>
+    import { filterMyLandProps, updateButtons } from "@/lib/trlg/component-utils"
+    import { TRLGClient } from "@/lib/trlg/socket"
+    import { _CITY_GROUPS, amountSum, BUILDABLE_LOCATIONS, initGameContext, parseSalesCommand, type CityGroupType, type EventType, type LandPropSaleType, type LottoChoiceType, type SerializedGameContext } from "@/lib/trlg/types"
+    import { rooms, sockets } from "@/store"
+
+    import { ModalOrNoticeBase } from "@/lib/trlg/types"
+
+    import type { ElementEventPair, ValuesType, UpdateReturnType } from "@/lib/trlg/types"
+
+    function greenNewDealUpdate(input: HTMLInputElement, values: ValuesType, callback?: () => void): UpdateReturnType<EventType & {type: "pickTargetLocation"}> {
+        let targetLocation = (input as HTMLInputElement).valueAsNumber
+        const correct0 = BUILDABLE_LOCATIONS.includes(targetLocation)
+        const correct1 = values.gameContext.mainStatuses.landProperties.locations.includes(targetLocation)
+            && (values.gameContext.mainStatuses.landProperties.map[targetLocation].operatorId === values.gameContext.nowPid)
+            && (values.gameContext.mainStatuses.landProperties.map[targetLocation].amount < 3);
+        if(callback !== undefined) {
+            callback()
+        }
+        return [!(correct0 && correct1), {type: "pickTargetLocation", targetLocation: targetLocation}]
+    }
+
+    
+    class GreenNewDealModal extends ModalOrNoticeBase {
+        unableToSubmit: boolean
+        event: EventType & {type: "pickTargetLocation"}
+        constructor() {
+            super()
+            const greenNewDealInput = this.querySelector("#greenNewDealInput") as HTMLInputElement
+            const greenNewDealSubmitBtn = this.querySelector("#submitBtn") as HTMLButtonElement
+            [this.unableToSubmit, this.event] = greenNewDealUpdate(greenNewDealInput, rooms.get()[this.gameId], () => {
+                updateButtons([greenNewDealSubmitBtn, () => {
+                    sockets[this.gameId].emit(this.event.type, {targetLocation: this.event.targetLocation})
+                }])
+            })
+            greenNewDealSubmitBtn.disabled = this.unableToSubmit
+            greenNewDealInput.addEventListener("change",(_) => {
+                [this.unableToSubmit, this.event] = greenNewDealUpdate(greenNewDealInput, rooms.get()[this.gameId])
+                greenNewDealSubmitBtn.disabled = this.unableToSubmit
+            })
+        }
+
+    }
+    customElements.define("green-new-deal-modal", GreenNewDealModal)
+</script>
