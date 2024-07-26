@@ -10,9 +10,9 @@ const {gameId} = Astro.params
 <Layout title={`${gameId} gameboard`} description={`the gameboard view of the game session ${gameId}`}>
     <Container>
         <div class="animate">
-            <BackToPrevious href={`/${gameId}/`}>Back to lobby</BackToPrevious>
+            <BackToPrevious href={`/game/${gameId}/`}>Back to lobby</BackToPrevious>
         </div>
-        {(gameId !== undefined) && <WrappedGameView client:only gameId={gameId}/>}
+        {(gameId !== undefined) && <WrappedGameView gameId={gameId}/>}
     </Container>
 </Layout>
 
