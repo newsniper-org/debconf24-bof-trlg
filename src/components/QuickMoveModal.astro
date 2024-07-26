@@ -1,0 +1,61 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+---
+<quick-move-modal data-gameId={gameId}>
+    <p>원하는 위치로 즉시 이동합니다. (출발점을 지나가는 경로인 경우, 월급을 받습니다.)</p>
+    <input type="number" min={0} max={53} id="quickMoveInput"/><br/>
+    <button id="submitBtn">즉시 이동</button>
+</quick-move-modal>
+
+<script>
+    import { filterMyLandProps, updateButtons } from "@/lib/trlg/component-utils"
+    import { TRLGClient } from "@/lib/trlg/socket"
+    import { _CITY_GROUPS, amountSum, BUILDABLE_LOCATIONS, initGameContext, parseSalesCommand, type CityGroupType, type EventType, type LandPropSaleType, type LottoChoiceType, type SerializedGameContext } from "@/lib/trlg/types"
+    import { rooms, sockets } from "@/store"
+
+    import { ModalOrNoticeBase } from "@/lib/trlg/types"
+
+    import type { ElementEventPair, ValuesType, UpdateReturnType } from "@/lib/trlg/types"
+
+    
+    
+    class QuickMoveModal extends ModalOrNoticeBase {
+        private _targetLocation: number = 0
+
+        get targetLocation() {
+            return this._targetLocation
+        }
+
+        set targetLocation(value) {
+            this._targetLocation = value
+        }
+
+        input = this.querySelector("#quickMoveInput") as HTMLInputElement
+        submitBtn = this.querySelector("#submitBtn") as HTMLButtonElement
+        constructor() {
+            super()
+
+            const {
+                mainStatuses: { players },
+                nowPid,
+            } = rooms.get()[this.gameId].gameContext
+
+            const nowLocation = players[nowPid].location
+            this.input.valueAsNumber = nowLocation
+
+            this.input.addEventListener("change", (_) => {
+                this.targetLocation = this.input.valueAsNumber
+            })
+
+            this.submitBtn.addEventListener("click", (_) => {
+                sockets[this.gameId].emit("pickTargetLocation", {targetLocation: this.targetLocation})
+            })
+        }
+    }
+
+    customElements.define("quick-move-modal", QuickMoveModal)
+</script>

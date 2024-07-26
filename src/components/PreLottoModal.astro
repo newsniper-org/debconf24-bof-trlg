@@ -1,0 +1,59 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+---
+<pre-lotto-modal data-gameId={gameId}>
+    <button id="doubleLottoTicketBtn">두배 찬스를 사용하여 도전</button>
+    <br/>
+    <button id="startLottoBtn">두배 찬스 사용하지 않고 도전</button>
+    <br/>
+    <button id="nopBtn">도전하지 않기</button>
+</pre-lotto-modal>
+
+<script>
+    import { filterMyLandProps } from "@/lib/trlg/component-utils"
+    import { TRLGClient } from "@/lib/trlg/socket"
+    import { _CITY_GROUPS, amountSum, BUILDABLE_LOCATIONS, initGameContext, parseSalesCommand, type CityGroupType, type EventType, type LandPropSaleType, type LottoChoiceType, type SerializedGameContext } from "@/lib/trlg/types"
+    import { rooms, sockets } from "@/store"
+
+    import { ModalOrNoticeBase } from "@/lib/trlg/types"
+
+    import type { ElementEventPair, ValuesType, UpdateReturnType } from "@/lib/trlg/types"
+
+    
+    class PreLottoModal extends ModalOrNoticeBase {
+        unableToSubmit: boolean
+
+        constructor() {
+            super();
+
+            const {
+                mainStatuses: {
+                    players
+                },
+                nowPid                        
+            } = rooms.get()[this.gameId].gameContext
+            this.unableToSubmit = !(players[nowPid].remaining.tickets.doubleLotto > 0);
+            
+            const doubleLottoTicketBtn = this.querySelector("#doubleLottoTicketBtn") as HTMLButtonElement
+            doubleLottoTicketBtn.disabled = this.unableToSubmit
+            doubleLottoTicketBtn.addEventListener("click", (_) => {
+                sockets[this.gameId].emit("startLotto", {useDoubleLottoTicket: true})
+            })
+
+            const startLottoBtn = this.querySelector("#startLottoBtn") as HTMLButtonElement
+            startLottoBtn.addEventListener("click", (_) => {
+                sockets[this.gameId].emit("startLotto", {useDoubleLottoTicket: false})
+            })
+
+            const nopBtn = this.querySelector("#nopBtn") as HTMLButtonElement
+            nopBtn.addEventListener("click", (_) => {
+                sockets[this.gameId].emitWithoutValue("nop")
+            })
+        }
+    }
+    customElements.define("pre-lotto-modal", PreLottoModal)
+</script>

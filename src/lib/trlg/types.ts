@@ -179,7 +179,7 @@ export type EventType = {type: "check"}
     | {type: "checkChanceCard"}
     | {type: "pickTargetPlayer"}
     | {type: "pickTargetLocation", targetLocation: number}
-    | {type: "pickTargetGroup", targetGroupId: CityGroupType}
+    | {type: "pickTargetGroup", targetGroup: CityGroupType}
     | {type: "tryLotto", choice: LottoChoiceType}
     | {type: "stopLotto"}
     | {type: "useTicket"}
@@ -349,13 +349,33 @@ export function parseSalesCommand(cmd: string, nowOwning: Map<number, {operatorI
     return dict
 }
 
+export abstract class ModalOrNoticeBase extends HTMLElement {
+    protected gameId: string
 
+    protected constructor() {
+        super()
+        this.gameId = this.dataset.gameId as string
+    }
+}
+
+export type ValuesType = {
+    state: string,
+    isOnline: boolean,
+    gameContext: SerializedGameContext,
+    playerId: 0|1|2|3|null,
+    nowPlayerAccount: string
+}
+
+export type UpdateReturnType<E extends EventType = EventType> = [boolean, E]
+
+export type ElementEventPair<T extends HTMLElement> = [T, () => void]
 
 
 export function amountSum(salesCommand: SalesType) {
     const amount = Array.from(salesCommand.entries()).reduce((acc, [_, a]) => acc+a, 0)
     return amount
 }
+
 
 export function initGameContext(): SerializedGameContext {
     return {

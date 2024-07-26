@@ -1,0 +1,66 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+---
+<maintenance-sell-modal data-gameId={gameId}>
+    <input type="text" id="maintenanceInput"/>
+    <br/>
+    <button id="submitBtn">
+        판매
+    </button>
+</maintenance-sell-modal>
+
+<script>
+    import { convertSalesCommand, filterMyLandProps, updateButtons } from "@/lib/trlg/component-utils"
+    import { TRLGClient } from "@/lib/trlg/socket"
+    import { _CITY_GROUPS, amountSum, BUILDABLE_LOCATIONS, initGameContext, parseSalesCommand, type CityGroupType, type EventType, type LandPropSaleType, type LottoChoiceType, type SerializedGameContext } from "@/lib/trlg/types"
+    import { rooms, sockets } from "@/store"
+
+    import { ModalOrNoticeBase } from "@/lib/trlg/types"
+
+    import type { ElementEventPair, ValuesType, UpdateReturnType } from "@/lib/trlg/types"
+
+    
+    function maintenanceSellUpdate(input: HTMLInputElement, values: ValuesType, callback?: () => void): UpdateReturnType<EventType & {type: "sell"}> {
+        const maintenanceNowPlayer = values.gameContext.mainStatuses.players[values.gameContext.nowPid]
+        const maintenanceNowCash = maintenanceNowPlayer.cash
+        const maintenanceNowMyLandProps = new Map([...filterMyLandProps(values.gameContext.mainStatuses.landProperties.locations,values.gameContext.mainStatuses.landProperties.map,values.gameContext.nowPid)])
+        
+        const maintenanceSalesCommand = parseSalesCommand((input).value,maintenanceNowMyLandProps)
+        const maintenanceTotalAmountToSell = amountSum(maintenanceSalesCommand)
+        const maintenanceTotalAmountAll = Array.from(maintenanceNowMyLandProps.values()).reduce((acc, {amount}) => acc+Math.max(0,amount),0)
+        const maintenanceTotalAmountRemaining = maintenanceTotalAmountAll - maintenanceTotalAmountToSell
+        const targets = Array.from(convertSalesCommand(maintenanceSalesCommand))
+        if(callback !== undefined) {
+            callback()
+        }
+        return [((maintenanceNowCash + (maintenanceTotalAmountToSell * 300000) - (maintenanceTotalAmountRemaining * 100000)) < 0) || (maintenanceTotalAmountToSell <= 0), {type: "sell", targets}]
+    }
+
+    
+    class MaintenanceSellModal extends ModalOrNoticeBase {
+        unableToSubmit: boolean
+        event: EventType & {type: "sell"}
+
+        constructor() {
+            super();
+
+            const maintenanceInput = this.querySelector("#maintenanceInput") as HTMLInputElement
+            const submitBtn = this.querySelector("#submitBtn") as HTMLButtonElement
+            [this.unableToSubmit, this.event] = maintenanceSellUpdate(maintenanceInput,rooms.get()[this.gameId], () => {
+                updateButtons([submitBtn, () => {
+                    sockets[this.gameId].emit("sell", {targets: this.event.targets})
+                }])
+            })
+            submitBtn.disabled = this.unableToSubmit
+            maintenanceInput.addEventListener("change", (_) => {
+                [this.unableToSubmit, this.event] = maintenanceSellUpdate(maintenanceInput,rooms.get()[this.gameId])
+                submitBtn.disabled = this.unableToSubmit
+            })
+        }
+    }
+    customElements.define("maintenance-sell-modal", MaintenanceSellModal)
+</script>

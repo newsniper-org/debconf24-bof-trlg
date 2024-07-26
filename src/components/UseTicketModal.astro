@@ -1,0 +1,43 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+
+---
+<use-ticket-modal data-gameId={gameId}>
+    <p id="askDisplay"/>
+    <br/>
+    <button id="yesBtn">네</button>
+    <button id="noBtn">아니오</button>
+</use-ticket-modal>
+
+<script>
+import { getUseTicketModalDisplay } from "@/lib/trlg/component-utils";
+import { ModalOrNoticeBase } from "@/lib/trlg/types";
+import { rooms, sockets } from "@/store";
+
+
+    class UseTicketModal extends ModalOrNoticeBase {
+        askDisplay = this.querySelector("#askDisplay") as HTMLParagraphElement
+        yesBtn = this.querySelector("#yesBtn") as HTMLButtonElement
+        noBtn = this.querySelector("#noBtn") as HTMLButtonElement
+
+        get ticketName() {
+            return getUseTicketModalDisplay(rooms.get()[this.gameId].state)
+        }
+
+        constructor() {
+            super()
+            this.askDisplay.replaceChildren(`${this.ticketName} 티켓을 사용하시겠습니까?`)
+            this.yesBtn.addEventListener("click", (_) => {
+                sockets[this.gameId].emitWithoutValue("useTicket")
+            })
+            this.noBtn.addEventListener("click", (_) => {
+                sockets[this.gameId].emitWithoutValue("nop")
+            })
+        }
+    }
+    customElements.define("use-ticket-modal", UseTicketModal)
+</script>

@@ -3,6 +3,7 @@ import { TRLGClient } from "@/lib/trlg/socket";
 import SocketWrapper from "@/components/SocketWrapper.astro";
 import type { SerializedGameContext } from "@/lib/trlg/types";
 import GameView from "@/components/GameView.astro";
+import { rooms } from "@/store";
 
 interface Props {
     gameId: string
@@ -11,8 +12,36 @@ interface Props {
 const { gameId } = Astro.props
 
 ---
-<SocketWrapper gameId={gameId}>
-    {(socket: TRLGClient | null, state: string, isOnline: boolean, gameContext: SerializedGameContext, playerId: 0|1|2|3|null, nowPlayerAccount: string) => (
-        (socket !== null) ? <GameView isOnline={isOnline} gameContext={gameContext} nowPlayerAccount={nowPlayerAccount}/> : <div></div>
-    )}
-</SocketWrapper>
+<wrapped-game-view data-gameId={gameId}>
+    <div id="gameView"/>
+</wrapped-game-view>
+
+<script>
+    import { rooms, tryConnect, type RoomDataType } from "@/store"
+import GameView from "./GameView.astro"
+import { TRLGClient } from "@/lib/trlg/socket"
+    class WrappedGameView extends HTMLElement {
+        updateValue<K extends keyof RoomDataType>(key: K, value: RoomDataType[K]) {
+            rooms.get()[this.gameId][key] = value
+        }
+        gameView = this.querySelector("#gameView") as HTMLDivElement
+        gameId = this.dataset.gameId as string
+        constructor() {
+            super()
+            tryConnect(this.gameId,new TRLGClient(
+                this.gameId,
+                (value) => {this.updateValue("state",value)},
+                (value) => {this.updateValue("isOnline",value)},
+                (value) => {this.updateValue("gameContext",value)},
+                (value) => {this.updateValue("playerId",value)},
+                (value) => {this.updateValue("nowPlayerAccount",value)}
+            ))
+            const {
+                isOnline, gameContext, nowPlayerAccount
+            } = rooms.get()[this.gameId]
+            this.gameView.appendChild(GameView({
+                isOnline, gameContext, nowPlayerAccount
+            }))
+        }
+    }
+</script>

@@ -1,4 +1,4 @@
-import type { SalesType, SerializedGameContext } from "./types"
+import type { ElementEventPair, SalesType, SerializedGameContext } from "./types"
 
 export type SerializedLandProperties = {
     [loc: number]: {
@@ -13,6 +13,16 @@ export function getPlayerColor(operatorId: 0|1|2|3) {
         case 1: return "#00ff00"
         case 2: return "#0000ff"
         case 3: return "#ffff00"
+    }
+}
+
+export function updateButtons(...pairs: ElementEventPair<HTMLButtonElement>[]) {
+    for(const [btn, onClick] of pairs) {
+        const oldOnClick = btn.onclick
+        if(oldOnClick !== null) {
+            btn.removeEventListener("click",oldOnClick)
+        }
+        btn.addEventListener("click",onClick)
     }
 }
 

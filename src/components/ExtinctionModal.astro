@@ -1,0 +1,62 @@
+---
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+
+---
+
+<extinction-modal data-gameId={gameId}>
+    <input id="extinctionInput" type="number" value={0} min={0} max={11} step={1}/><br/>
+    <button id="submitBtn">증축공사 시행</button>
+</extinction-modal>
+
+<script>
+    import { filterMyLandProps, updateButtons } from "@/lib/trlg/component-utils"
+    import { TRLGClient } from "@/lib/trlg/socket"
+    import { _CITY_GROUPS, amountSum, BUILDABLE_LOCATIONS, initGameContext, parseSalesCommand, type CityGroupType, type EventType, type LandPropSaleType, type LottoChoiceType, type SerializedGameContext } from "@/lib/trlg/types"
+    import { rooms, sockets } from "@/store"
+
+    import { ModalOrNoticeBase } from "@/lib/trlg/types"
+
+    import type { ElementEventPair, ValuesType, UpdateReturnType } from "@/lib/trlg/types"
+
+
+    function extinctionUpdate(input: HTMLInputElement, values: ValuesType, callback?: () => void): UpdateReturnType<EventType & {type: "pickTargetGroup"}> {
+        let targetGroup = Math.max(0,Math.min(11, (input as HTMLInputElement).valueAsNumber)) as CityGroupType
+        const targets = _CITY_GROUPS[targetGroup]
+        const amountSum = targets.map((target) => {
+            if(values.gameContext.mainStatuses.landProperties.locations.includes(target)) {
+                return values.gameContext.mainStatuses.landProperties.map[target].amount
+            } else {
+                return 0
+            }
+        }).reduce((sum, amount) => sum + amount,0)
+        if(callback !== undefined) {
+            callback()
+        }
+        return [!(amountSum > 0), {type: "pickTargetGroup", targetGroup}]
+    }
+
+    class ExtinctionModal extends ModalOrNoticeBase {
+        unableToSubmit: boolean
+        event: EventType & {type: "pickTargetGroup"}
+        constructor() {
+            super()
+            const extinctionInput = this.querySelector("#extinctionInput") as HTMLInputElement
+            const submitBtn = this.querySelector("#submitBtn") as HTMLButtonElement
+            [this.unableToSubmit, this.event] = extinctionUpdate(extinctionInput, rooms.get()[this.gameId], () => {
+                updateButtons([submitBtn, () => { 
+                    sockets[this.gameId].emit(this.event.type, {targetGroup: this.event.targetGroup})
+                }])
+            });
+            submitBtn.disabled = this.unableToSubmit
+            extinctionInput.addEventListener("change",(_) => {
+                [this.unableToSubmit, this.event] = extinctionUpdate(extinctionInput as HTMLInputElement, rooms.get()[this.gameId])
+                submitBtn.disabled = this.unableToSubmit
+            });
+        }
+    }
+    customElements.define("extinction-modal", ExtinctionModal)
+</script>
