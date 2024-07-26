@@ -1,7 +1,0 @@
-{
-  "$schema": "https://www.partykit.io/schema.json",
-  "name": "debconf24",
-  "main": "party/index.ts",
-  "compatibilityDate": "2024-07-23",
-  "port": 11000
-}
