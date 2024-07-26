@@ -66,7 +66,7 @@ if (hostEmail !== undefined && hostEmail !== null && Astro.request.method === "P
     } else {
       dupErrors.guestEmail1 = dupErrors.guestEmail2 = dupErrors.guestEmail3 = ""
     }
-    const hasErrors = Object.values(errors).some(msg => msg)
+    const hasErrors = Object.values(errors).some(msg => msg.length > 0)
     const hasDupErrors = Object.values(dupErrors).some(msg => msg)
     if((!hasErrors) && (!hasDupErrors)) {
       const response = await fetch("/gameapi/create",
@@ -81,9 +81,7 @@ if (hostEmail !== undefined && hostEmail !== null && Astro.request.method === "P
           ])
         }
       )
-      const {
-        newGameId
-      }: {newGameId: string} = await response.json()
+      const newGameId = (await response.json()).newGameId
       return Astro.redirect(`/game/${newGameId}/`)
     }
   } catch (error) {
