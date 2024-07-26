@@ -10,7 +10,6 @@ import {
 } from '@builder.io/qwik';
 import { TRLGSocketContext } from './TRLGSocketContext';
 import type { SerializedGameContext } from '@/lib/trlg/types';
-import PartySocket from 'partysocket';
 import { TRLGClient } from '@/lib/trlg/socket';
 
 function initGameContext(): SerializedGameContext {
