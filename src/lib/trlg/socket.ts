@@ -1,6 +1,6 @@
-import PartySocket from 'partysocket';
 import type { SerializedGameContext } from './types';
-import WS from 'ws';
+
+import { io, Socket } from "socket.io-client"
 
 function initGameContext(): SerializedGameContext {
     return {
@@ -105,8 +105,7 @@ function initGameContext(): SerializedGameContext {
 }
 
 export class TRLGClient {
-    private socket: PartySocket
-    private gameId: string
+    private socket: Socket
     private _state: string
     private _isOnline: boolean
     private _gameContext: SerializedGameContext
@@ -119,6 +118,7 @@ export class TRLGClient {
     private updatePlayerId: (value: 0|1|2|3|null) => void
     private updateNowPlayerAccount: (value: string) => void
 
+    private gameId: string
 
     public get state() {
         return this._state
@@ -160,10 +160,6 @@ export class TRLGClient {
         this.updateNowPlayerAccount(value)
     }
 
-    private onError() {
-        console.log(`Error in the room ${this.gameId}`)
-    }
-
     private onRefresh(state: string, gameContext: SerializedGameContext, nowPlayerAccount: string) {
         [
             this._state, this._gameContext, this._nowPlayerAccount
@@ -173,11 +169,11 @@ export class TRLGClient {
     }
 
     public emit<T>(type: string, value: T) {
-        this.socket.send(JSON.stringify({type, value}))
+        this.socket.emit(type, value)
     }
 
     public emitWithoutValue(type: string) {
-        this.socket.send(JSON.stringify({type}))
+        this.socket.emit(type)
     }
 
     private onJoinSucceed() {
@@ -196,8 +192,8 @@ export class TRLGClient {
     }
 
     public constructor(gameId: string, updateState: (value: string) => void, updateIsOnline: (value: boolean) => void, updateGameContext: (value: SerializedGameContext) => void, updatePlayerId: (value: 0|1|2|3|null) => void, updateNowPlayerAccount: (value: string) => void) {
-        this.gameId = gameId
         this._isOnline = false
+        this.gameId = gameId
         this._gameContext = initGameContext()
         this._playerId = null
         this._nowPlayerAccount = ""
@@ -209,50 +205,44 @@ export class TRLGClient {
         this.updateNowPlayerAccount = updateNowPlayerAccount
 
 
-        this.socket = new PartySocket({
-            host: import.meta.env.NEXT_PUBLIC_PARTYKIT_URL,
-            room: `${gameId}`,
-            WebSocket: WS
-        });
+        this.socket = io(
+            import.meta.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:11000",
+            {
+              withCredentials: true,
+            }
+        )
         this._state = ""
 
-        this.socket.addEventListener("open", (event) => {
-            console.log(`Connected to PartySocket server`)
-            this.onJoinSucceed()
+        this.socket.on("connect", () => {
+            console.log(`Connected to Socket.IO server`)
+            this.socket.emit("joinRoom", {gameId: this.gameId})
         })
 
-        this.socket.addEventListener("close", (event) => {
+        this.socket.on("joinFailed", ({msg}: {msg: string}) => {
+            console.log(`Failed to join the room: ${msg}`);
+        });
+
+        this.socket.on("disconnect",() => {
             console.log(`Disconnected to PartySocket server`)
             this._playerId = null
             this._isOnline = false
         })
 
-        this.socket.addEventListener("message", (event) => {
-            const message = JSON.parse(event.data);
-            switch(message.type) {
-                case "refresh":
-                    let state: string = message.value.state
-                    let gameContext: SerializedGameContext = message.value.gameContext
-                    let nowPlayerAccount: string = message.value.nowPlayerAccount
-                    this.onRefresh(state,gameContext,nowPlayerAccount)
-                    break;
-                case "playGranted":
-                    this.onPlayGranted(message.value.playerId)
-                    break;
-                case "playNotGranted":
-                    this.onPlayNotGranted()
-                    break;
-                default:
-			        console.log(`Unknown type "${message.type}"`);
-                    break;
-            }
+        this.socket.on("refresh", ({state, gameContext, nowPlayerAccount}: {state: string, gameContext: SerializedGameContext, nowPlayerAccount: string}) => {
+            this.onRefresh(state,gameContext,nowPlayerAccount)
         })
 
-        this.socket.addEventListener("error", () => {this.onError()})
-    }
-    
-    public grant(accountEmail: string) {
-        this.emit("grant", {account: accountEmail})
+        this.socket.on("playGranted", ({playerId}: {playerId: 0|1|2|3}) => {
+            this.onPlayGranted(playerId)
+        })
+
+        this.socket.on("playNotGranted", () => {
+            this.onPlayNotGranted()
+        })
+
+        this.socket.on("joinSucceed", () => {
+            this.onJoinSucceed()
+        })
     }
 
     public close() {

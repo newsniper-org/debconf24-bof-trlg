@@ -3,9 +3,10 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "concurrently \"partykit dev\" \"astro dev\"",
-    "dev-verbose": "concurrently \"partykit dev\" \"astro dev --verbose\"",
+    "dev": "astro dev",
+    "dev:verbose": "astro dev --verbose",
     "start": "astro dev",
+    "start:verbose": "astro dev --verbose",
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro"
@@ -23,17 +24,14 @@
     "astro": "^4.12.2",
     "auth-astro": "^4.1.2",
     "clsx": "^2.1.1",
-    "partysocket": "^1.0.1",
+    "socket.io-client": "^4.7.5",
     "tailwind-merge": "^2.4.0",
     "tailwindcss": "^3.4.6",
     "typescript": "^5.5.4",
-    "ws": "^8.18.0",
     "xstate": "^5.15.0"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",
-    "@types/node": "^20.14.11",
-    "@types/ws": "^8.5.11",
-    "partykit": "^0.0.108"
+    "@types/node": "^20.14.11"
   }
 }
