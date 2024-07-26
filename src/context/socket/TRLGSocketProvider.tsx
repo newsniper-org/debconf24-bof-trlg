@@ -115,7 +115,7 @@ function initGameContext(): SerializedGameContext {
     }
 }
 
-const useSocket = (serverPath: string, gid: string) => {
+const useSocket = (gid: string) => {
     const socket = useSignal<NoSerialize<TRLGClient>>(undefined)
     const isOnline = useSignal<boolean>(false)
     const state = useSignal<string>("")
@@ -158,7 +158,7 @@ export const TRLGSocketProvider = component$<{gid: string}>(({gid}) => {
         gameContext,
         gameId,
         playerId
-    } = useSocket(import.meta.env.TRLG_BACKEND_SOCKETIO_URL,gid);
+    } = useSocket(gid);
 
     useContextProvider(TRLGSocketContext,useStore({
         socket,
