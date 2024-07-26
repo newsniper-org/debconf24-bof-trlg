@@ -1,0 +1,34 @@
+---
+interface Props {
+    gameId: string
+}
+
+
+import { TRLGClient } from "@/lib/trlg/socket";
+import { initGameContext, type SerializedGameContext } from "@/lib/trlg/types";
+
+let [
+    _state,
+    _isOnline,
+    _gameContext,
+    _playerId,
+    _nowPlayerAccount
+]: [string,boolean,SerializedGameContext, (0|1|2|3|null), string] = ["", false, initGameContext(),null, ""]
+
+const { gameId } = Astro.props
+
+const _socket = new TRLGClient(
+    gameId,
+    (value) => {_state = value},
+    (value) => {_isOnline = value},
+    (value) => {_gameContext = value},
+    (value) => {_playerId = value},
+    (value) => {_nowPlayerAccount = value}
+)
+
+
+---
+
+<div>
+    <Fragment set:html={Astro.slots.render('default', [_socket, _state, _isOnline, _gameContext, _playerId, _nowPlayerAccount])}/>
+</div>

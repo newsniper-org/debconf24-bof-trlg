@@ -1,0 +1,17 @@
+---
+import type { DiceType } from '@/lib/trlg/types'
+import Dice from './Dice.astro'
+
+
+interface Props {
+    pair: [DiceType, DiceType] | null
+}
+
+const [d1, d2] = Astro.props.pair ?? [null, null]
+
+---
+
+<div>
+    <Dice value={d1} />
+    <Dice value={d2} />
+</div>

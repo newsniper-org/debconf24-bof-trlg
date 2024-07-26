@@ -1,7 +1,7 @@
 ---
+import WrappedGameView from "@/components/WrappedGameView.astro";
 import BackToPrevious from "@/components/BackToPrevious.astro";
 import Container from "@/components/Container.astro";
-import WrappedGameView from "@/components/trlg/WrappedGameView";
 import Layout from "@/layouts/Layout.astro";
 
 const {gameId} = Astro.params
@@ -12,7 +12,7 @@ const {gameId} = Astro.params
         <div class="animate">
             <BackToPrevious href={`/game/${gameId}/`}>Back to lobby</BackToPrevious>
         </div>
-        {(gameId !== undefined) && <WrappedGameView client:load gameId={gameId}/>}
+        {(gameId !== undefined) && <WrappedGameView gameId={gameId}/>}
     </Container>
 </Layout>
 

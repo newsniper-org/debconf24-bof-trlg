@@ -1,0 +1,18 @@
+---
+import { TRLGClient } from "@/lib/trlg/socket";
+import PartySocketWrapper from "@/components/PartySocketWrapper.astro";
+import type { SerializedGameContext } from "@/lib/trlg/types";
+import GameView from "@/components/GameView.astro";
+
+interface Props {
+    gameId: string
+}
+
+const { gameId } = Astro.props
+
+---
+<PartySocketWrapper gameId={gameId}>
+    {(socket: TRLGClient | null, state: string, isOnline: boolean, gameContext: SerializedGameContext, playerId: 0|1|2|3|null, nowPlayerAccount: string) => (
+        (socket !== null) ? <GameView isOnline={isOnline} gameContext={gameContext} nowPlayerAccount={nowPlayerAccount}/> : <div></div>
+    )}
+</PartySocketWrapper>

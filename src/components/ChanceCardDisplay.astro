@@ -1,0 +1,30 @@
+---
+import { CHANCE_CARD_DISPLAY_CONTENTS } from '@/lib/trlg/chance-card-defs'
+import type { ChanceCardKindType } from '@/lib/trlg/types'
+import ValidChanceCardDisplay from '@/components/ValidChanceCardDisplay.astro'
+
+
+interface Props {
+    chanceKind: ChanceCardKindType | null
+}
+
+const {chanceKind} = Astro.props
+
+---
+{
+    (chanceKind === null) ? (
+        <svg width="127mm" height="71.438mm" version="1.1" viewBox="0 0 127 71.438" xmlns="http://www.w3.org/2000/svg" filter="grayscale(100%)">
+            <g transform="translate(-25 -113.65)" stroke-linejoin="round">
+                <g>
+                    <rect x="25" y="113.65" width="127" height="71.438" fill="#cf6547" stroke-width=".69244"/>
+                    <rect x="25" y="113.65" width="127" height="18.884" fill="#f0dfac" stroke-width=".35601"/>
+                    
+                    <rect x="42.93" y="151.3" width="91.14" height="1.3805" fill="#8f2d34" stroke-width=".081544"/>
+                    <rect x="25" y="172.1" width="127" height="12.992" fill="#f0dfac" stroke-width=".2953"/>
+                </g>
+                <rect x="27.559" y="116.31" width="121.88" height="66.121" fill="none" stroke="#8f2d34" stroke-width=".52917"/>
+                
+            </g>
+        </svg>
+    ) : <ValidChanceCardDisplay chanceKind={chanceKind}/>
+}
