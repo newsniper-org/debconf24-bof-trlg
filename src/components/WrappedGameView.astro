@@ -13,18 +13,16 @@ const { gameId } = Astro.props
 
 ---
 <wrapped-game-view data-gameId={gameId}>
-    <div id="gameView"/>
+    <GameView isOnline={rooms.get()[gameId].isOnline} gameContext={rooms.get()[gameId].gameContext} nowPlayerAccount={rooms.get()[gameId].nowPlayerAccount}/>
 </wrapped-game-view>
 
 <script>
     import { rooms, tryConnect, type RoomDataType } from "@/store"
-    import GameView from "./GameView.astro"
     import { TRLGClient } from "@/lib/trlg/socket"
     class WrappedGameView extends HTMLElement {
         updateValue<K extends keyof RoomDataType>(key: K, value: RoomDataType[K]) {
             rooms.get()[this.gameId][key] = value
         }
-        gameView = this.querySelector("#gameView") as HTMLDivElement
         gameId = this.dataset.gameId as string
         constructor() {
             super()
@@ -36,12 +34,6 @@ const { gameId } = Astro.props
                 (value) => {this.updateValue("playerId",value)},
                 (value) => {this.updateValue("nowPlayerAccount",value)}
             ))
-            const {
-                isOnline, gameContext, nowPlayerAccount
-            } = rooms.get()[this.gameId]
-            this.gameView.appendChild(GameView({
-                isOnline, gameContext, nowPlayerAccount
-            }))
         }
     }
     customElements.define("wrapped-game-view", WrappedGameView)
