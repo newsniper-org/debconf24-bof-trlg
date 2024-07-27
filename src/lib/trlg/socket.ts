@@ -206,7 +206,7 @@ export class TRLGClient {
 
 
         this.socket = io(
-            import.meta.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:11000",
+            import.meta.env.NEXT_SOCKET_URL,
             {
               withCredentials: true,
             }
